@@ -39,3 +39,7 @@ print ( f"\n{ '= ' * 50}")
 print (" Exploration terminee !")
 print (" Prochain lab : entrainer un modele ML")
 print ( f"{ '= ' * 50}")
+# Analyse croisée : Nombre de patients par sexe et par diagnostic
+print("\n--- Analyse par Sexe et Diagnostic ---")
+analyse_croisee = df.groupby(['sexe', 'diagnostic']).size()
+print(analyse_croisee)
