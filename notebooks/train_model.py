@@ -60,13 +60,11 @@ import seaborn as sns
 cm = confusion_matrix(y_test, y_pred, labels=model.classes_)
 print("Matrice de confusion :")
 print(cm)
-
 # Rapport de classification
 print("\nRapport de classification :")
 print(classification_report(y_test, y_pred))
 import joblib
 import os
-
 # Créer le dossier models/ s'il n'existe pas
 os.makedirs("models", exist_ok=True)
 
@@ -134,4 +132,27 @@ print(f"\nProbabilités par classe :")
 for classe, proba in zip(model_loaded.classes_, probas):
     bar = '#' * int(proba * 30)
     print(f"  {classe:8s} : {proba:.1%} {bar}")
+importances = model.feature_importances_
+for name, imp in sorted(zip(feature_cols, importances),
+                        key=lambda x: x[1], reverse=True):
+    print(f"  {name:20s} : {imp:.3f}")
+    # Exercice 2 - 3 patients fictifs
+patients_test = [
+    {'age': 16, 'sexe': 'M', 'temperature': 37.0, 'tension_sys': 115,
+     'toux': False, 'fatigue': False, 'maux_tete': False, 'region': 'Dakar'},
+    {'age': 35, 'sexe': 'F', 'temperature': 40.2, 'tension_sys': 125,
+     'toux': True, 'fatigue': True, 'maux_tete': True, 'region': 'Thiès'},
+    {'age': 72, 'sexe': 'M', 'temperature': 38.8, 'tension_sys': 145,
+     'toux': True, 'fatigue': True, 'maux_tete': False, 'region': 'Saint-Louis'},
+]
+
+print("\n--- Tests avec 3 patients fictifs ---")
+for i, p in enumerate(patients_test):
+    sexe_enc = le_sexe_loaded.transform([p['sexe']])[0]
+    region_enc = le_region_loaded.transform([p['region']])[0]
+    features = [[p['age'], sexe_enc, p['temperature'], p['tension_sys'],
+                 int(p['toux']), int(p['fatigue']), int(p['maux_tete']), region_enc]]
+    diag = model_loaded.predict(features)[0]
+    proba = model_loaded.predict_proba(features)[0].max()
+    print(f"Patient {i+1} ({p['sexe']}, {p['age']} ans) : {diag} ({proba:.0%})")
 
