@@ -26,7 +26,15 @@ app = FastAPI(
     description="Assistant pre-diagnostic medical pour le Senegal",
     version="0.2.0"
 )
+from fastapi.middleware.cors import CORSMiddleware
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 print("Chargement du modele...")
 model = joblib.load("models/model.pkl")
 le_sexe = joblib.load("models/encoder_sexe.pkl")
@@ -77,3 +85,11 @@ def predict(patient: PatientInput):
         confiance=confiance,
         message=messages.get(diagnostic, "Consultez un medecin.")
     )
+    @app.get("/model-info")
+    def model_info():
+        return {
+            "type": type(model).__name__,
+            "n_arbres": model.n_estimators,
+            "classes": list(model.classes_),
+            "n_features": model.n_features_in_
+        }
