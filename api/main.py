@@ -2,7 +2,18 @@ import joblib
 import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
+import os
+from dotenv import load_dotenv
+from groq import Groq
 
+load_dotenv()
+groq_client = None
+groq_api_key = os.getenv("GROQ_API_KEY")
+if groq_api_key:
+    groq_client = Groq(api_key=groq_api_key)
+    print("Client Groq initialise.")
+else:
+    print("ATTENTION : GROQ_API_KEY non trouvee.")
 class PatientInput(BaseModel):
     """Donnees d'entree : les symptomes d'un patient."""
     age: int = Field(..., ge=0, le=120, description="Age en annees")
@@ -93,3 +104,67 @@ def predict(patient: PatientInput):
             "classes": list(model.classes_),
             "n_features": model.n_features_in_
         }
+class ExplainInput(BaseModel):
+    diagnostic: str
+    probabilite: float
+    age: int
+    sexe: str
+    temperature: float
+    region: str
+
+class ExplainOutput(BaseModel):
+    explication: str
+    modele_llm: str = "llama-3.1-8b-instant"
+
+SYSTEM_PROMPT = """Tu es un assistant medical senegalais.
+Explique le diagnostic en francais simple.
+Sois rassurant mais recommande une consultation.
+Maximum 3 phrases. Ne fais JAMAIS de diagnostic toi-meme."""
+@app.post("/explain",response_model=ExplainOutput)
+def explain(data: ExplainInput):
+    if not groq_client:
+        return ExplainOutput(explication="Service indisponible.", modele_llm="aucun")
+    user_prompt = (
+        f"Patient : {data.sexe}, {data.age} ans, region {data.region}\n"
+        f"Temperature : {data.temperature}C\n"
+        f"Diagnostic : {data.diagnostic} (probabilite {data.probabilite:.0%})\n"
+        f"Explique ce resultat au patient."
+    )
+    try:
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt}
+            ],
+            max_tokens=200,
+            temperature=0.3
+        )
+        explication = response.choices[0].message.content
+    except Exception as e:
+        explication = f"Erreur : {str(e)}"
+    return ExplainOutput(explication=explication)
+@app.post("/explain", response_model=ExplainOutput)
+def explain(data: ExplainInput):
+    if not groq_client:
+        return ExplainOutput(explication="Service indisponible.", modele_llm="aucun")
+    user_prompt = (
+        f"Patient : {data.sexe}, {data.age} ans, region {data.region}\n"
+        f"Temperature : {data.temperature}C\n"
+        f"Diagnostic : {data.diagnostic} (probabilite {data.probabilite:.0%})\n"
+        f"Explique ce resultat au patient."
+    )
+    try:
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt}
+            ],
+            max_tokens=200,
+            temperature=0.3
+        )
+        explication = response.choices[0].message.content
+    except Exception as e:
+        explication = f"Erreur : {str(e)}"
+    return ExplainOutput(explication=explication)
