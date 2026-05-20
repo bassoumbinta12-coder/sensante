@@ -1,6 +1,6 @@
 ---
 title: Sensnte
-colorTo:green 
+colorTo: green 
 sdk: docker
 pinned: false
 ---
