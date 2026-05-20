@@ -1,3 +1,9 @@
+---
+title: Sensnte
+colorTo:green 
+sdk: docker
+pinned: false
+---
 # SenSante
 
 Assistant de pre-diagnostic medical pour le Senegal.
