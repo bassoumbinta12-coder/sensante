@@ -37,3 +37,15 @@ Bineta Bassoum - L2 GLSI - ESP/UCAD
 ## Cours
 
 Integration de Modeles IA - Dr. El Hadji Bassirou TOURE
+# SenSante
+Assistant pre-diagnostic medical pour le senegal.
+## demo en ligne
+https://huggingface.co/spaces/binetaesp/sensante
+## Stack
+- scikit-learn (modele ML)
+- FastAPI (API REST)
+- Tailwind css (frontend responsive)
+- Groqgit  / Llama 3 (explication LLM)
+- Docker (conteneurisation)
+## Auteur 
+Bineta- L2 GLSI C - ESP/UCAD - 2026
