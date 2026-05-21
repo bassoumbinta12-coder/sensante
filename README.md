@@ -1,8 +1,10 @@
 ---
 title: Sensnte
+colorFrom: blue
 colorTo: green 
 sdk: docker
 pinned: false
+app_port: 8000
 ---
 # SenSante
 
