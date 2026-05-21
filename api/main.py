@@ -54,7 +54,7 @@ model = joblib.load("models/model.pkl")
 le_sexe = joblib.load("models/encoder_sexe.pkl")
 le_region = joblib.load("models/encoder_region.pkl")
 feature_cols = joblib.load("models/feature_cols.pkl")
-print(f"Modele charge : {type(model)._name_}")
+print(f"Modele charge avec succes!")
 print(f"classes : {list(model.classes_)}")
 
 @app.get("/health")
